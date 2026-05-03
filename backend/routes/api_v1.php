@@ -1,8 +1,9 @@
 <?php
 
-use App\Http\Controllers\ClassroomController;
-use App\Http\Controllers\ExamController;
-use App\Http\Controllers\QuestionController;
+use App\Http\Controllers\Api\V1\ClassroomController;
+use App\Http\Controllers\Api\V1\ExamController;
+use App\Http\Controllers\Api\V1\ExamSessionController;
+use App\Http\Controllers\Api\V1\QuestionController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\V1\AuthController;
 
@@ -36,4 +37,15 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('exams.questions', QuestionController::class)
         ->except(['index', 'show'])
         ->shallow();
+
+    // Exam Sessions (students only)
+    Route::middleware('role:student')->group(function () {
+        Route::post('exams/{exam}/session/start', [ExamSessionController::class, 'start']);
+        
+        Route::prefix('sessions/{session}')->group(function () {
+            Route::post('answer', [ExamSessionController::class, 'submitAnswer']);
+            Route::post('submit', [ExamSessionController::class, 'submit']);
+            Route::get('result', [ExamSessionController::class, 'result']);
+        });
+    });
 });
