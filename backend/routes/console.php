@@ -11,3 +11,7 @@ Artisan::command('inspire', function () {
 Schedule::command('exam:close-expired')
     ->everyMinute()
     ->withoutOverlapping();
+
+Schedule::command('exam:notify-students')
+    ->everyFiveMinutes()
+    ->withoutOverlapping();

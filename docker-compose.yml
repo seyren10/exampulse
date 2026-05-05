@@ -61,6 +61,16 @@ services:
     networks:
       - exampulse
 
+  mailpit:
+    image: axllent/mailpit:latest
+    container_name: exampulse-mailpit
+    restart: unless-stopped
+    ports:
+      - "1025:1025"  # SMTP
+      - "8025:8025"  # Web UI
+    networks:
+      - exampulse
+
 networks:
   exampulse:
     driver: bridge

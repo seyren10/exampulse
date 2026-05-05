@@ -2,25 +2,26 @@
 
 namespace App\Events;
 
-use App\Models\ExamResult;
+use App\Models\LiveQuizSession;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Broadcasting\PresenceChannel;
 use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
-use Illuminate\Contracts\Events\ShouldDispatchAfterCommit;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-class ExamGraded implements ShouldDispatchAfterCommit
+class QuizCompleted implements ShouldBroadcast
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
     /**
      * Create a new event instance.
      */
-    public function __construct(public ExamResult $examResult)
-    {
+    public function __construct(
+        public LiveQuizSession $liveQuizSession,
+        public array $finalLeaderboard
+    ) {
         //
     }
 
@@ -32,7 +33,20 @@ class ExamGraded implements ShouldDispatchAfterCommit
     public function broadcastOn(): array
     {
         return [
-            new PrivateChannel('channel-name'),
+            new PrivateChannel("quiz.{$this->liveQuizSession->room_code}"),
+        ];
+    }
+
+    public function broadcastAs(): string
+    {
+        return 'quiz.completed';
+    }
+
+    public function broadcastWith(): array
+    {
+        return [
+            'message' => 'Quiz has been completed',
+            'final_leaderboard' => $this->finalLeaderboard,
         ];
     }
 }

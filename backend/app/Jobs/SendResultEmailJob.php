@@ -2,15 +2,17 @@
 
 namespace App\Jobs;
 
+use App\Mail\ExamResultMail;
 use App\Models\ExamResult;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Queue\Attributes\Backoff;
 use Illuminate\Queue\Attributes\Tries;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 
 #[Tries(3), Backoff(10, 30, 60)]
-class SentResultEmailJob implements ShouldQueue
+class SendResultEmailJob implements ShouldQueue
 {
     use Queueable;
 
@@ -30,18 +32,7 @@ class SentResultEmailJob implements ShouldQueue
         $result = $this->examResult->fresh();
         $result->load(['student', 'exam']);
 
-        // Simple email for now (we'll use Mailable in Phase 6)
-        $data = [
-            'student_name' => $result->student->name,
-            'exam_title' => $result->exam->title,
-            'score' => $result->score,
-            'total_points' => $result->total_points,
-            'percentage' => $result->percentage,
-            'rank' => $result->rank,
-        ];
-
-        // For now, just log (we'll configure mail in Phase 6)
-        Log::info('Exam result email would be sent', $data);
+        Mail::to($result->student->email)->send(new ExamResultMail($result));
 
         // Mark email as sent
         $result->update(['email_sent' => true]);
