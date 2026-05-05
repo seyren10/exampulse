@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Laravel\Scout\Searchable;
 
 #[Fillable([
     'exam_id',
@@ -16,6 +17,18 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 ])]
 class Question extends Model
 {
+    use Searchable;
+
+    // Indexes question text so teachers can search their question banks
+    public function toSearchableArray(): array
+    {
+        return [
+            'id'            => $this->id,
+            'question_text' => $this->question_text,
+            'exam_title'    => $this->exam?->title,
+            'exam_id'       => $this->exam_id,
+        ];
+    }
     public function exam(): BelongsTo
     {
         return $this->belongsTo(Exam::class);

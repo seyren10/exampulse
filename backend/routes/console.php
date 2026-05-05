@@ -13,5 +13,5 @@ Schedule::command('exam:close-expired')
     ->withoutOverlapping();
 
 Schedule::command('exam:notify-students')
-    ->everyFiveMinutes()
+    ->everyTenMinutes()
     ->withoutOverlapping();

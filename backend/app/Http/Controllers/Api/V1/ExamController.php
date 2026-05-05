@@ -8,11 +8,13 @@ use App\Http\Requests\UpdateExamRequest;
 use App\Http\Resources\ExamResource;
 use App\Models\Classroom;
 use App\Models\Exam;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 
 class ExamController extends Controller
 {
+
     /**
      * List exams for a classroom
      */
@@ -22,14 +24,18 @@ class ExamController extends Controller
 
         $user = Auth::user();
 
-        $query = $classroom->exams()->withCount('questions');
+        $q = request()->query('q');
 
-        // Students only see published exams
-        if ($user->isStudent()) {
-            $query->where('is_published', true);
-        }
+        // Use Scout for search with query() to apply database filters
+        $exams = Exam::search($q)
+            ->query(
+                fn($query) =>
+                $query->where('classroom_id', $classroom->id)
+                    ->when($user->isStudent(), fn($q) => $q->where('is_published', true))
+                    ->latest()
+            )
+            ->paginate();
 
-        $exams = $query->latest()->get();
 
         return ExamResource::collection($exams);
     }

@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Laravel\Scout\Searchable;
 
 #[Fillable([
     'classroom_id',
@@ -22,6 +23,10 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 ])]
 class Exam extends Model
 {
+    use Searchable;
+
+
+
     protected function casts(): array
     {
         return [
@@ -31,6 +36,26 @@ class Exam extends Model
             'is_published' => 'boolean',
         ];
     }
+
+    // Defines the Meilisearch document shape for this model
+    public function toSearchableArray(): array
+    {
+        return [
+            'id' => $this->id,
+            'title' => $this->title,
+            'description' => $this->description,
+            'type' => $this->type,
+            'classroom' => $this->classroom?->name,
+            'teacher' => $this->classroom?->teacher?->name,
+        ];
+    }
+
+    // Only index published exams
+    public function shouldBeSearchable(): bool
+    {
+        return (bool) $this->is_published;
+    }
+
 
     // Relationships
     public function classroom(): BelongsTo

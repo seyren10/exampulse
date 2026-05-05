@@ -73,7 +73,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('sessions/{session}/leaderboard', [LiveQuizController::class, 'leaderboard']);
     });
 
-     // Notifications
+    // Notifications
     Route::prefix('notifications')->group(function () {
         Route::get('/', [NotificationController::class, 'index']);
         Route::get('unread-count', [NotificationController::class, 'unreadCount']);
