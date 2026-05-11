@@ -16,8 +16,10 @@ import {
 } from "@/components/ui/field";
 import { useLogin } from "@/features/auth/hooks/useLogin";
 export default function Login() {
-  const [mutate, isPending] = useLogin();
-  
+  const [mutate, isPending] = useLogin({
+    redirect: true,
+  });
+
   const form = useForm<LoginCredential>({
     resolver: zodResolver(loginCredentialSchema),
     defaultValues: {

@@ -1,12 +1,14 @@
 import { AppLayout } from "@/layouts/app-layout";
 import { Dashboard } from "@/pages/dashboard";
-import { createBrowserRouter } from "react-router";
+import { createBrowserRouter, replace } from "react-router";
 import { authRoutes } from "./auth";
+import { getUserLoader } from "@/features/auth/loaders";
 
 const router = createBrowserRouter([
   {
     path: "/",
     Component: AppLayout,
+    loader: getUserLoader,
     children: [
       {
         index: true,
@@ -31,6 +33,10 @@ const router = createBrowserRouter([
         },
       },
     ],
+  },
+  {
+    path: "/dashboard",
+    loader: () => replace("/"),
   },
   authRoutes,
 ]);

@@ -8,4 +8,5 @@ export const getUserQueryOptions = () =>
     staleTime: 1000 * 60 * 120, // 2 hours
     retry: false,
     retryOnMount: false,
+    throwOnError: false,
   });

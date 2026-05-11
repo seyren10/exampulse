@@ -6,40 +6,53 @@ export const authRoutes: RouteObject = {
   Component: AuthLayout,
   children: [
     {
+      //redirect to login if the path is /auth
       index: true,
       loader: () => replace("/auth/login"),
     },
     {
-      path: "login",
+      // guest routes
+      path: "",
       lazy: {
-        Component: async () => (await import("@/pages/auth/login")).default,
+        loader: async () => (await import("./guards/guest")).default,
       },
-    },
-    {
-      path: "register",
-      lazy: {
-        Component: async () => (await import("@/pages/auth/register")).default,
-      },
-    },
-    {
-      path: "forgot-password",
-      lazy: {
-        Component: async () =>
-          (await import("@/pages/auth/forgot-password")).default,
-      },
-    },
-    {
-      path: "reset-password",
-      lazy: {
-        Component: async () =>
-          (await import("@/pages/auth/reset-password")).default,
-      },
+      children: [
+        {
+          path: "login",
+          lazy: {
+            Component: async () => (await import("@/pages/auth/login")).default,
+          },
+        },
+        {
+          path: "register",
+          lazy: {
+            Component: async () =>
+              (await import("@/pages/auth/register")).default,
+          },
+        },
+        {
+          path: "forgot-password",
+          lazy: {
+            Component: async () =>
+              (await import("@/pages/auth/forgot-password")).default,
+          },
+        },
+        {
+          path: "reset-password",
+          lazy: {
+            Component: async () =>
+              (await import("@/pages/auth/reset-password")).default,
+          },
+        },
+      ],
     },
     {
       path: "verify-email",
       lazy: {
         Component: async () =>
           (await import("@/pages/auth/verify-email")).default,
+        loader: async () =>
+          (await import("@/features/auth/loaders")).verifyEmailLoader,
       },
     },
     {

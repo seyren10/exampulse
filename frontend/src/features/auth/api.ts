@@ -17,3 +17,11 @@ export const login = async (credentials: LoginCredential) => {
 
 export const csrfCookie = async () =>
   await httpClient.get("/sanctum/csrf-cookie");
+
+export const sendEmailVerification = async () => {
+  const res = await httpClient.post<{ status: string }>(
+    "/email/verification-notification",
+  );
+
+  return res.data;
+};

@@ -14,3 +14,6 @@ export type UserRole = (typeof userRole)[number];
 
 export type LoginCredential = z.infer<typeof loginCredentialSchema>;
 
+export type UserState = {
+  user: User | null;
+};

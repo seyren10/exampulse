@@ -1,18 +1,33 @@
-import { useState } from "react";
 import { Link } from "react-router";
 import { Button } from "@/components/ui/button";
 import { Mail, CheckCircle } from "lucide-react";
+import { useMutation } from "@tanstack/react-query";
+import { sendEmailVerification } from "@/features/auth/api";
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
 
 export default function VerifyEmail() {
-  const [isResending, setIsResending] = useState(false);
   const [resent, setResent] = useState(false);
+  const [isResending, setIsResending] = useState(false);
+
+  const { mutate, mutateAsync } = useMutation({
+    mutationFn: sendEmailVerification,
+  });
+
+  useEffect(() => {
+    mutate();
+  }, []);
 
   const handleResend = async () => {
-    setIsResending(true);
     try {
-      // TODO: API call to resend verification email
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      setIsResending(true);
+
+      await mutateAsync();
+
       setResent(true);
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    } catch (err) {
+      toast.error("Failed to resend verification email");
     } finally {
       setIsResending(false);
     }
