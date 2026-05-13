@@ -1,5 +1,5 @@
 import type z from "zod";
-import type { loginCredentialSchema, resetPasswordSchema, userRole } from "./schema";
+import type { loginCredentialSchema, registerSchema, resetPasswordSchema, userRole } from "./schema";
 
 export type User = {
   id: number;
@@ -14,6 +14,7 @@ export type UserRole = (typeof userRole)[number];
 
 export type LoginCredentialSchema = z.infer<typeof loginCredentialSchema>;
 export type ResetPasswordSchema = z.infer<typeof resetPasswordSchema>;
+export type RegisterSchema = z.infer<typeof registerSchema>;
 
 export type UserState = {
   user: User | null;

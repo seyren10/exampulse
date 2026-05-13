@@ -20,8 +20,8 @@ export function AuthLayout() {
             </div>
           </div>
           <div>
-            <h1 className="text-4xl font-bold mb-2">ExamPulse</h1>
-            <p className="text-muted-foreground text-lg">
+            <h1 className="text-4xl font-bold mb-2 font-heading">ExamPulse</h1>
+            <p className="text-muted-foreground text-lg font-heading">
               Create engaging quizzes and exams. Track student performance in real-time.
             </p>
           </div>

@@ -1,11 +1,20 @@
 import { httpClient } from "@/services/axios";
-import type { LoginCredentialSchema, ResetPasswordSchema, User } from "./type";
+import type {
+  LoginCredentialSchema,
+  RegisterSchema,
+  ResetPasswordSchema,
+  User,
+} from "./type";
 
 export const getUser = async () => {
   const res = await httpClient.get<User>("/api/user");
   return res.data;
 };
 
+export const registerUser = async (user: RegisterSchema) => {
+  const res = await httpClient.post<User>("/register", user);
+  return res.data;
+};
 export const logoutUser = async () => {
   await httpClient.post("/logout");
 };

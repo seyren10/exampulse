@@ -5,6 +5,7 @@ import { useMutation } from "@tanstack/react-query";
 import { sendEmailVerification } from "@/features/auth/api";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
+import { useLogout } from "@/features/auth/hooks/useLogout";
 
 export default function VerifyEmail() {
   const [resent, setResent] = useState(false);
@@ -32,6 +33,10 @@ export default function VerifyEmail() {
       setIsResending(false);
     }
   };
+
+  const [logout, isLoggingOut] = useLogout({
+    redirect: true,
+  });
 
   return (
     <div className="space-y-6 text-center">
@@ -70,8 +75,13 @@ export default function VerifyEmail() {
               : "Resend verification email"}
         </Button>
 
-        <Link to="/login">
-          <Button variant="ghost" className="w-full">
+        <Link to="/auth/login">
+          <Button
+            variant="ghost"
+            className="w-full"
+            disabled={isLoggingOut}
+            onClick={() => logout()}
+          >
             Back to login
           </Button>
         </Link>
