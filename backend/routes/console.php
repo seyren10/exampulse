@@ -15,3 +15,6 @@ Schedule::command('exam:close-expired')
 Schedule::command('exam:notify-students')
     ->everyTenMinutes()
     ->withoutOverlapping();
+
+Schedule::command('auth:clear-resets')
+    ->everyFifteenMinutes();
