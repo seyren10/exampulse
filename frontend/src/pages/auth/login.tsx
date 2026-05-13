@@ -4,7 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { FileText } from "lucide-react";
 import { Controller, useForm } from "react-hook-form";
-import type { LoginCredential } from "@/features/auth/type";
+import type { LoginCredentialSchema } from "@/features/auth/type";
 import { loginCredentialSchema } from "@/features/auth/schema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { DevTool } from "@hookform/devtools";
@@ -20,7 +20,7 @@ export default function Login() {
     redirect: true,
   });
 
-  const form = useForm<LoginCredential>({
+  const form = useForm<LoginCredentialSchema>({
     resolver: zodResolver(loginCredentialSchema),
     defaultValues: {
       email: "",
@@ -29,7 +29,7 @@ export default function Login() {
     },
   });
 
-  const handleSubmit = form.handleSubmit((data: LoginCredential) =>
+  const handleSubmit = form.handleSubmit((data: LoginCredentialSchema) =>
     mutate(data, {
       onError: () => {
         form.setFocus("email");

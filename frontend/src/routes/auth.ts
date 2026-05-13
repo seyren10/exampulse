@@ -11,7 +11,7 @@ export const authRoutes: RouteObject = {
       loader: () => replace("/auth/login"),
     },
     {
-      // guest routes
+      // GUEST ROUTES
       path: "",
       lazy: {
         loader: async () => (await import("./guards/guest")).default,

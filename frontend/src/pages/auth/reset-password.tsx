@@ -1,43 +1,46 @@
-import { useState } from "react";
-import { useNavigate, useSearchParams } from "react-router";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { Link, useNavigate, useSearchParams } from "react-router";
+import { Controller, useForm } from "react-hook-form";
+import type { ResetPasswordSchema } from "@/features/auth/type";
+import { resetPasswordSchema } from "@/features/auth/schema";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { KeyRound } from "lucide-react";
-import type { ExampulseError } from "@/types/common";
+import { useResetPassword } from "@/features/auth/hooks/use-reset-password";
+import { Button } from "@/components/ui/button";
+import {
+  Field,
+  FieldDescription,
+  FieldError,
+  FieldGroup,
+  FieldLabel,
+} from "@/components/ui/field";
+import { Input } from "@/components/ui/input";
 
 export default function ResetPassword() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const token = searchParams.get("token");
   const email = searchParams.get("email");
+  const [mutate, isPending] = useResetPassword();
 
-  const [formData, setFormData] = useState({
-    password: "",
-    password_confirmation: "",
+  const form = useForm<ResetPasswordSchema>({
+    resolver: zodResolver(resetPasswordSchema),
+    defaultValues: {
+      token,
+      email,
+      password: "",
+      password_confirmation: "",
+    },
   });
-  const [errors, setErrors] = useState<Record<string, string>>({});
-  const [isLoading, setIsLoading] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsLoading(true);
-    setErrors({});
-
-    try {
-      // TODO: API call with token, email, and new password
-      console.log("Reset password:", { token, email, ...formData });
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-
-      // Navigate to login on success
-      navigate("/login");
-    } catch (error: unknown) {
-      const exampulseError = error as ExampulseError;
-      setErrors(exampulseError.response?.data?.errors || {});
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  const handleSubmit = form.handleSubmit((data) =>
+    mutate(data, {
+      onSuccess: () => {
+        navigate("/auth/login", {
+          replace: true,
+        });
+      },
+    }),
+  );
 
   return (
     <div className="space-y-6">
@@ -55,43 +58,52 @@ export default function ResetPassword() {
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-4">
-        <div className="space-y-2">
-          <Label htmlFor="password">New Password</Label>
-          <Input
-            id="password"
-            type="password"
-            placeholder="Enter new password"
-            value={formData.password}
-            onChange={(e) =>
-              setFormData({ ...formData, password: e.target.value })
-            }
-            required
+        <FieldGroup>
+          <Controller
+            name="password"
+            control={form.control}
+            render={({ field, fieldState }) => (
+              <Field data-invalid={fieldState.invalid}>
+                <FieldLabel htmlFor={field.name}>New Password</FieldLabel>
+                <Input
+                  {...field}
+                  placeholder="Enter new password"
+                  type="password"
+                />
+                {fieldState.invalid && (
+                  <FieldError errors={[fieldState.error]} />
+                )}
+              </Field>
+            )}
           />
-          {errors.password && (
-            <p className="text-sm text-destructive">{errors.password}</p>
-          )}
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="password_confirmation">Confirm Password</Label>
-          <Input
-            id="password_confirmation"
-            type="password"
-            placeholder="Confirm new password"
-            value={formData.password_confirmation}
-            onChange={(e) =>
-              setFormData({
-                ...formData,
-                password_confirmation: e.target.value,
-              })
-            }
-            required
+          <Controller
+            name="password_confirmation"
+            control={form.control}
+            render={({ field, fieldState }) => (
+              <Field data-invalid={fieldState.invalid}>
+                <FieldLabel htmlFor={field.name}>Confirm Password</FieldLabel>
+                <Input
+                  {...field}
+                  placeholder="Enter new password"
+                  type="password"
+                />
+                <FieldDescription>Password must match above</FieldDescription>
+                {fieldState.invalid && (
+                  <FieldError errors={[fieldState.error]} />
+                )}
+              </Field>
+            )}
           />
-        </div>
 
-        <Button type="submit" className="w-full" disabled={isLoading}>
-          {isLoading ? "Resetting..." : "Reset password"}
-        </Button>
+          <div className="space-y-2">
+            <Button type="submit" className="w-full" disabled={isPending}>
+              {isPending ? "Resetting..." : "Reset password"}
+            </Button>
+            <Button type="button" className="w-full" variant="link" asChild>
+              <Link to="/auth/login">Back to login</Link>
+            </Button>
+          </div>
+        </FieldGroup>
       </form>
     </div>
   );

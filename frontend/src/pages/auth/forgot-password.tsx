@@ -2,34 +2,38 @@ import { useState } from "react";
 import { Link } from "react-router";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { KeyRound, CheckCircle } from "lucide-react";
-import type { ExampulseError } from "@/types/common";
+import { useForgotPassword } from "@/features/auth/hooks/use-forget-password";
+import { Controller, useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import z from "zod";
+import {
+  Field,
+  FieldError,
+  FieldGroup,
+  FieldLabel,
+} from "@/components/ui/field";
 
 export default function ForgotPassword() {
-  const [email, setEmail] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
+  const [mutate, isPending] = useForgotPassword();
   const [sent, setSent] = useState(false);
-  const [error, setError] = useState("");
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsLoading(true);
-    setError("");
+  const form = useForm({
+    resolver: zodResolver(
+      z.object({
+        email: z.email(),
+      }),
+    ),
+    defaultValues: {
+      email: "",
+    },
+  });
 
-    try {
-      // TODO: API call to send reset link
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      setSent(true);
-    } catch (err: unknown) {
-      const exampulseError = err as ExampulseError;
-      setError(
-        exampulseError.response?.data?.message || "Failed to send reset link",
-      );
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  const handleSubmit = form.handleSubmit((data) =>
+    mutate(data.email, {
+      onSuccess: () => setSent(true),
+    }),
+  );
 
   if (sent) {
     return (
@@ -43,7 +47,8 @@ export default function ForgotPassword() {
         <div className="space-y-2">
           <h1 className="text-2xl font-bold">Check your email</h1>
           <p className="text-muted-foreground">
-            We've sent a password reset link to <strong>{email}</strong>
+            We've sent a password reset link to{" "}
+            <strong>{form.getValues("email")}</strong>
           </p>
         </div>
 
@@ -70,21 +75,24 @@ export default function ForgotPassword() {
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-4">
-        <div className="space-y-2">
-          <Label htmlFor="email">Email</Label>
-          <Input
-            id="email"
-            type="email"
-            placeholder="name@example.com"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
+        <FieldGroup className="space-y-2">
+          <Controller
+            name="email"
+            control={form.control}
+            render={({ field, fieldState }) => (
+              <Field data-invalid={fieldState.invalid}>
+                <FieldLabel htmlFor={field.name}>Email</FieldLabel>
+                <Input {...field} type="email" placeholder="name@example.com" />
+                {fieldState.error && (
+                  <FieldError>{fieldState.error.message}</FieldError>
+                )}
+              </Field>
+            )}
           />
-          {error && <p className="text-sm text-destructive">{error}</p>}
-        </div>
+        </FieldGroup>
 
-        <Button type="submit" className="w-full" disabled={isLoading}>
-          {isLoading ? "Sending..." : "Send reset link"}
+        <Button type="submit" className="w-full" disabled={isPending}>
+          {isPending ? "Sending..." : "Send reset link"}
         </Button>
       </form>
 
