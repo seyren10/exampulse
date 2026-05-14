@@ -36,7 +36,10 @@ const router = createBrowserRouter([
   },
   {
     path: "/dashboard",
-    loader: () => replace("/"),
+    loader: ({ request }) => {
+      const { search } = new URL(request.url);
+      return replace(`/${search}`);
+    },
   },
   authRoutes,
 ]);

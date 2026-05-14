@@ -14,7 +14,7 @@ import {
   FieldGroup,
   FieldLabel,
 } from "@/components/ui/field";
-import { useLogin } from "@/features/auth/hooks/useLogin";
+import { useLogin } from "@/features/auth/hooks/use-login";
 export default function Login() {
   const [mutate, isPending] = useLogin({
     redirect: true,

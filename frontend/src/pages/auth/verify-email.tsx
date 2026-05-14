@@ -5,7 +5,7 @@ import { useMutation } from "@tanstack/react-query";
 import { sendEmailVerification } from "@/features/auth/api";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { useLogout } from "@/features/auth/hooks/useLogout";
+import { useLogout } from "@/features/auth/hooks/use-logout";
 
 export default function VerifyEmail() {
   const [resent, setResent] = useState(false);

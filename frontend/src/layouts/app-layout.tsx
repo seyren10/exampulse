@@ -1,5 +1,4 @@
-import { useState } from "react";
-import { Outlet, Link, useLocation } from "react-router";
+import { Outlet, Link, useLocation, useSearchParams } from "react-router";
 import {
   Bell,
   Settings,
@@ -12,6 +11,10 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { useSelector } from "react-redux";
+import { selectUser } from "@/features/auth/slice";
+import { useEffect } from "react";
+import { toast } from "sonner";
 
 const navigation = [
   { name: "Dashboard", href: "/", icon: LayoutDashboard },
@@ -22,11 +25,15 @@ const navigation = [
 
 export function AppLayout() {
   const location = useLocation();
-  const [user] = useState({
-    name: "John Teacher",
-    email: "teacher@exampulse.com",
-    avatar: null,
-  });
+  const user = useSelector(selectUser);
+  const [searchParams] = useSearchParams();
+
+  useEffect(() => {
+    if (searchParams.get("verified"))
+      toast.success("Email verified successfully", {
+        position: "top-center",
+      });
+  }, []);
 
   return (
     <div className="min-h-screen bg-background">
@@ -81,8 +88,8 @@ export function AppLayout() {
 
             {/* User Avatar */}
             <Avatar>
-              <AvatarImage src={user.avatar || undefined} />
-              <AvatarFallback>{user.name.charAt(0)}</AvatarFallback>
+              <AvatarImage src={user?.avatar || undefined} />
+              <AvatarFallback>{user?.name.charAt(0)}</AvatarFallback>
             </Avatar>
           </div>
         </div>
