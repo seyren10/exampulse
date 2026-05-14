@@ -1,7 +1,7 @@
 import { ACCOUNT_TYPE } from "@/constants";
 import z from "zod";
 
-export const userRole = ["owner", "member"] as const;
+export const USER_ROLE = ["student", "teacher"] as const;
 
 export const loginCredentialSchema = z.object({
   email: z.email(),

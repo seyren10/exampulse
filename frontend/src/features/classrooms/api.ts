@@ -1,6 +1,7 @@
 import { httpClient } from "@/services/axios";
 import type {
   Classroom,
+  ClassroomDetail,
   ClassroomSchema,
   GetClassroomsQueryParams,
 } from "./type";
@@ -12,6 +13,13 @@ export const getClassrooms = async (params?: GetClassroomsQueryParams) => {
     {
       params,
     },
+  );
+  return res.data;
+};
+
+export const getClassroomDetail = async (classroomId: number) => {
+  const res = await httpClient.get<ClassroomDetail>(
+    `/api/v1/classrooms/${classroomId}`,
   );
   return res.data;
 };
@@ -32,5 +40,12 @@ export const updateClassroom = async (
 };
 export const deleteClassroom = async (classroomId: number) => {
   const res = await httpClient.delete(`/api/v1/classrooms/${classroomId}`);
+  return res.data;
+};
+
+export const joinClassroom = async (joinCode: string) => {
+  const res = await httpClient.post<Classroom>("/api/v1/classrooms/join", {
+    code: joinCode,
+  });
   return res.data;
 };

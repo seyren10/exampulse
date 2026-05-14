@@ -1,0 +1,1 @@
+export const EXAM_TYPE = ["live", "async"] as const

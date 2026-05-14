@@ -22,7 +22,6 @@ type Props = PropsWithChildren & {
   loading?: boolean;
 };
 
-
 export default function ClassroomForm({
   onClose,
   classroom,
@@ -74,8 +73,8 @@ export default function ClassroomForm({
                 </span>
               </FieldLabel>
               <Textarea
+                className="overflow-y-auto max-h-56"
                 placeholder="A short description visible to students…"
-                className="resize-y"
                 rows={3}
                 {...field}
               />

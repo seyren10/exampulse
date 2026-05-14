@@ -16,8 +16,11 @@ import type { Classroom, ClassroomSchema } from "@/features/classrooms/type";
 import ClassroomDropdownMenu from "./components/classroom-dropdown";
 import EditClassroomDialog from "./components/dialogs/edit-classroom-dialog";
 import AppConfirmDialog from "@/components/app/app-confirm-dialog";
+import ClassroomsEmpty from "./components/classroom-empty";
+import { useUserPermissions } from "@/features/auth/hooks/use-user-permissions";
 
 export default function Classrooms() {
+  const { hasPermission, user } = useUserPermissions();
   const { data, isPending, isError, error } = useQuery(
     getClassroomsQueryOptions(),
   );
@@ -57,7 +60,6 @@ export default function Classrooms() {
       },
     );
   };
-
   const handleOpenEditDialog = (classroom: Classroom) => {
     setEditOpenDialog(true);
     setSelectedClassroom(classroom);
@@ -86,36 +88,51 @@ export default function Classrooms() {
             Manage your classrooms and students
           </p>
         </div>
-        <Button onClick={() => setCreateOpenDialog(true)}>
-          <Plus className="mr-2 h-4 w-4" />
-          Create Classroom
-        </Button>
+        {hasPermission("teacher") && (
+          <Button onClick={() => setCreateOpenDialog(true)}>
+            <Plus className="mr-2 h-4 w-4" />
+            Create Classroom
+          </Button>
+        )}
       </div>
 
       {isPending ? (
-        <ClassroomListSkeleton />
+        /* Pending State */
+        <ClassroomListSkeleton listCount={9} />
       ) : isError ? (
+        /* Error State */
         <p>{error.message}</p>
+      ) : !data.data.length ? (
+        /* Empty State */
+        <ClassroomsEmpty
+          role={user!.role}
+          onCreateClassroom={() => setCreateOpenDialog(true)}
+        />
       ) : (
+        /* Classroom List */
         <ClassroomList
           classrooms={data.data}
-          action={(classroom) => (
-            <ClassroomDropdownMenu
-              classroom={classroom}
-              onEdit={handleOpenEditDialog}
-              onDelete={handleDeleteClassroomConfirmation}
-            >
-              <Button
-                className="md:group-hover:visible md:invisible"
-                variant="ghost"
-                size="icon"
-                aria-label="Classroom actions"
-                onClick={() => setEditOpenDialog(true)}
-              >
-                <MoreHorizontal />
-              </Button>
-            </ClassroomDropdownMenu>
-          )}
+          action={(classroom) => {
+            return (
+              hasPermission("teacher") && (
+                <ClassroomDropdownMenu
+                  classroom={classroom}
+                  onEdit={handleOpenEditDialog}
+                  onDelete={handleDeleteClassroomConfirmation}
+                >
+                  <Button
+                    className="md:group-hover:visible md:invisible"
+                    variant="ghost"
+                    size="icon"
+                    aria-label="Classroom actions"
+                    onClick={() => setEditOpenDialog(true)}
+                  >
+                    <MoreHorizontal />
+                  </Button>
+                </ClassroomDropdownMenu>
+              )
+            );
+          }}
         ></ClassroomList>
       )}
 

@@ -3,6 +3,7 @@ import { Dashboard } from "@/pages/dashboard";
 import { createBrowserRouter, replace } from "react-router";
 import { authRoutes } from "./auth";
 import { getUserLoader } from "@/features/auth/loaders";
+import { classroomRoutes } from "./classrooms";
 
 const router = createBrowserRouter([
   {
@@ -14,12 +15,7 @@ const router = createBrowserRouter([
         index: true,
         Component: Dashboard,
       },
-      {
-        path: "/classrooms",
-        lazy: {
-          Component: async () => (await import("@/pages/classrooms")).default,
-        },
-      },
+      classroomRoutes,
       {
         path: "/exams",
         lazy: {
