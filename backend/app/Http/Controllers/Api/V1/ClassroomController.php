@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\Api\V1;
 
-use App\Enums\UserRole;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreClassroomRequest;
 use App\Http\Requests\UpdateClassroomRequest;
@@ -17,13 +16,14 @@ class ClassroomController extends Controller
     /**
      * List all classrooms (teacher: owned, student: enrolled)
      */
-    public function index()
+    public function index(Request $request)
     {
         $user = Auth::user();
+        $perPage = $request->input('per_page', 25);
 
         $classrooms = $user->isTeacher() ?
-            $user->classrooms()->withCount('students')->latest()->get() :
-            $user->enrolledClassrooms()->withCount('students')->latest()->get();
+            $user->classrooms()->withCount(['students', 'exams'])->latest()->paginate($perPage) :
+            $user->enrolledClassrooms()->withCount(['students', 'exams'])->latest()->paginate($perPage);
 
         return ClassroomResource::collection($classrooms);
     }
@@ -35,7 +35,7 @@ class ClassroomController extends Controller
     {
         Gate::authorize('view', $classroom);
 
-        $classroom->load(['teacher:id,name,email', 'students:id,name,email']);
+        $classroom->load(['teacher:id,name,email', 'students:id,name,email', 'exams']);
 
         return new ClassroomResource($classroom);
     }
