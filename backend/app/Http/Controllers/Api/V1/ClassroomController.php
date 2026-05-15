@@ -108,4 +108,11 @@ class ClassroomController extends Controller
         return new ClassroomResource($classroom->fresh());
     }
 
+    public function leave(Classroom $classroom)
+    {
+        $classroom->students()->detach(Auth::id());
+
+        return response()->noContent();
+    }
+
 }

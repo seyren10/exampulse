@@ -20,6 +20,7 @@ Route::middleware('auth:sanctum')->group(function () {
     // Classrooms
     Route::apiResource('classrooms', ClassroomController::class);
     Route::post('classrooms/join', [ClassroomController::class, 'join']);
+    Route::delete('classrooms/{classroom}/leave', [ClassroomController::class, 'leave']);
 
     // Exams (nested under classrooms)
     Route::apiResource('classrooms.exams', ExamController::class)->shallow();
