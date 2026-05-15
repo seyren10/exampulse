@@ -49,3 +49,6 @@ export const joinClassroom = async (joinCode: string) => {
   });
   return res.data;
 };
+export const leaveClassroom = async (classroomId: number) => {
+  await httpClient.delete<Classroom>(`/api/v1/classrooms/${classroomId}/leave`);
+};

@@ -16,9 +16,10 @@ import {
   Users,
   ClipboardList,
   Share2,
+  DoorOpen,
 } from "lucide-react";
 import { toast } from "sonner";
-import type { Classroom } from "@/features/classrooms/type";
+import type { Classroom, ClassroomSchema } from "@/features/classrooms/type";
 import { buildJoinUrl } from "@/lib/helpers";
 import {
   Dialog,
@@ -29,23 +30,77 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { useUserPermissions } from "@/features/auth/hooks/use-user-permissions";
+import { useQuery } from "@tanstack/react-query";
+import { getClassroomDetailOptions } from "@/features/classrooms/query";
+import { Skeleton } from "@/components/ui/skeleton";
+import AppConfirmDialog from "@/components/app/app-confirm-dialog";
+import {
+  useDeleteClassroom,
+  useLeaveClassroom,
+  useUpdateClassroom,
+} from "@/features/classrooms/hooks/use-classroom";
+import EditClassroomDialog from "./dialogs/edit-classroom-dialog";
+import ClassroomForm from "./classroom-form";
+import { useNavigate } from "react-router";
 
 type Props = PropsWithChildren & {
   classroom: Classroom;
-  onEdit?: (classroom: Classroom) => void;
-  onDelete?: (classroom: Classroom) => void;
   onManageStudents?: (classroom: Classroom) => void;
   onCreateExam?: (classroom: Classroom) => void;
+  onLeaveClassroom?: (classroom: Classroom) => void;
 };
 export default function ClassroomDropdownMenu({
   classroom,
-  onEdit,
-  onDelete,
   onManageStudents,
   onCreateExam,
   children,
 }: Props) {
+  const navigate = useNavigate();
+
   const [shareOpen, setShareOpen] = useState(false);
+  const { isClassroomOwner } = useUserPermissions();
+
+  const [openLeaveConfirmDialog, setOpenLeaveConfirmDialog] = useState(false);
+  const [leaveClassroom, isLeaving] = useLeaveClassroom();
+
+  const [updateClassroom, isUpdating] = useUpdateClassroom();
+  const [openEditDialog, setEditOpenDialog] = useState(false);
+
+  const [openDeleteDialog, setDeleteOpenDialog] = useState(false);
+  const [deleteClassroom, isDeleting] = useDeleteClassroom();
+
+  const handleUpdateClassroom = (payload: ClassroomSchema) => {
+    updateClassroom(
+      {
+        classroomId: classroom.id,
+        payload,
+      },
+      {
+        onSuccess: () => {
+          setEditOpenDialog(false);
+        },
+      },
+    );
+  };
+
+  const handleLeaveClassroom = () => {
+    leaveClassroom(classroom.id, {
+      onSuccess: () => {
+        setOpenLeaveConfirmDialog(false);
+        navigate("/classrooms");
+      },
+    });
+  };
+
+  const handleDeleteClassroom = () => {
+    deleteClassroom(classroom.id, {
+      onSuccess: () => {
+        setDeleteOpenDialog(false);
+        navigate("/classrooms");
+      },
+    });
+  };
 
   return (
     <>
@@ -54,57 +109,65 @@ export default function ClassroomDropdownMenu({
 
         <DropdownMenuContent align="end" className="w-56">
           {/* ── Group 1: Join Code ── */}
-          <DropdownMenuGroup>
-            <DropdownMenuLabel className="text-xs font-normal text-muted-foreground">
-              Invite
-            </DropdownMenuLabel>
-            <DropdownMenuItem onSelect={() => setShareOpen(true)}>
-              <Share2 data-icon="inline-start" />
-              Share join link
-            </DropdownMenuItem>
-          </DropdownMenuGroup>
 
-          <DropdownMenuSeparator />
-
-          {/* ── Group 2: Classroom Settings ── */}
-          <DropdownMenuGroup>
-            <DropdownMenuLabel className="text-xs font-normal text-muted-foreground">
-              Manage
-            </DropdownMenuLabel>
-            <DropdownMenuItem onSelect={() => onEdit?.(classroom)}>
-              <Pencil data-icon="inline-start" />
-              Edit classroom
-            </DropdownMenuItem>
-            <DropdownMenuItem onSelect={() => onManageStudents?.(classroom)}>
-              <Users data-icon="inline-start" />
-              Manage students
-            </DropdownMenuItem>
-          </DropdownMenuGroup>
-
-          <DropdownMenuSeparator />
-
-          {/* ── Group 3: Content ── */}
-          <DropdownMenuGroup>
-            <DropdownMenuLabel className="text-xs font-normal text-muted-foreground">
-              Content
-            </DropdownMenuLabel>
-            <DropdownMenuItem onSelect={() => onCreateExam?.(classroom)}>
-              <ClipboardList data-icon="inline-start" />
-              Create exam
-            </DropdownMenuItem>
-          </DropdownMenuGroup>
-
-          <DropdownMenuSeparator />
+          {isClassroomOwner(classroom.teacher_id) && (
+            <>
+              <DropdownMenuGroup>
+                <DropdownMenuLabel className="text-xs font-normal text-muted-foreground">
+                  Invite
+                </DropdownMenuLabel>
+                <DropdownMenuItem onSelect={() => setShareOpen(true)}>
+                  <Share2 data-icon="inline-start" />
+                  Share join link
+                </DropdownMenuItem>
+              </DropdownMenuGroup>
+              <DropdownMenuSeparator />
+              {/* ── Group 2: Classroom Settings ── */}
+              <DropdownMenuGroup>
+                <DropdownMenuLabel className="text-xs font-normal text-muted-foreground">
+                  Manage
+                </DropdownMenuLabel>
+                <DropdownMenuItem onSelect={() => setEditOpenDialog(true)}>
+                  <Pencil data-icon="inline-start" />
+                  Edit classroom
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onSelect={() => onManageStudents?.(classroom)}
+                >
+                  <Users data-icon="inline-start" />
+                  Manage students
+                </DropdownMenuItem>
+              </DropdownMenuGroup>
+              <DropdownMenuSeparator />
+              {/* ── Group 3: Content ── */}
+              <DropdownMenuGroup>
+                <DropdownMenuLabel className="text-xs font-normal text-muted-foreground">
+                  Content
+                </DropdownMenuLabel>
+                <DropdownMenuItem onSelect={() => onCreateExam?.(classroom)}>
+                  <ClipboardList data-icon="inline-start" />
+                  Create exam
+                </DropdownMenuItem>
+              </DropdownMenuGroup>
+              <DropdownMenuSeparator />
+            </>
+          )}
 
           {/* ── Group 4: Danger Zone ── */}
           <DropdownMenuGroup>
-            <DropdownMenuItem
-              onSelect={() => onDelete?.(classroom)}
-              className="text-destructive focus:text-destructive focus:bg-destructive/10"
-            >
-              <Trash2 data-icon="inline-start" />
-              Delete classroom
-            </DropdownMenuItem>
+            <LeaveClassroomDropdownMenuItem
+              classroom={classroom}
+              onLeaveClassroom={() => setOpenLeaveConfirmDialog(true)}
+            />
+            {isClassroomOwner(classroom.teacher_id) && (
+              <DropdownMenuItem
+                onSelect={() => setDeleteOpenDialog(true)}
+                className="text-destructive focus:text-destructive focus:bg-destructive/10"
+              >
+                <Trash2 className="stroke-destructive" />
+                Delete classroom
+              </DropdownMenuItem>
+            )}
           </DropdownMenuGroup>
         </DropdownMenuContent>
       </DropdownMenu>
@@ -114,6 +177,41 @@ export default function ClassroomDropdownMenu({
         open={shareOpen}
         onOpenChange={setShareOpen}
         classroom={classroom}
+      />
+
+      {/* Edit classroom dialog */}
+      <EditClassroomDialog
+        open={openEditDialog}
+        onOpenChange={setEditOpenDialog}
+      >
+        <ClassroomForm
+          onClose={() => setEditOpenDialog(false)}
+          onSubmit={handleUpdateClassroom}
+          loading={isUpdating}
+          classroom={classroom}
+        />
+      </EditClassroomDialog>
+
+      {/* ── Leave Classroom Confirm Dialog ── */}
+      <AppConfirmDialog
+        loading={isLeaving}
+        variant="destructive"
+        open={openLeaveConfirmDialog}
+        onOpenChange={(open) => {
+          if (!isLeaving) setOpenLeaveConfirmDialog(open);
+        }}
+        title="You are about to leave this classroom"
+        description="Are you sure you want to leave this classroom? You will no longer be able to access the classroom or its content."
+        onConfirm={handleLeaveClassroom}
+      />
+
+      {/* Delete classroom dialog */}
+      <AppConfirmDialog
+        variant="destructive"
+        loading={isDeleting}
+        open={openDeleteDialog}
+        onOpenChange={setDeleteOpenDialog}
+        onConfirm={handleDeleteClassroom}
       />
     </>
   );
@@ -183,5 +281,31 @@ function ShareDialog({ open, onOpenChange, classroom }: ShareDialogProps) {
         </div>
       </DialogContent>
     </Dialog>
+  );
+}
+
+type LeaveClassroomDropdownMenuItemProps = {
+  classroom: Classroom;
+  onLeaveClassroom?: (classroom: Classroom) => void;
+};
+function LeaveClassroomDropdownMenuItem({
+  classroom,
+  onLeaveClassroom,
+}: LeaveClassroomDropdownMenuItemProps) {
+  const { data, isPending } = useQuery(getClassroomDetailOptions(classroom.id));
+  const { isStudentOfClassroom } = useUserPermissions();
+
+  if (isPending) return <Skeleton className="h-5" />;
+
+  if (data && !isStudentOfClassroom(data)) return null;
+
+  return (
+    <DropdownMenuItem
+      onSelect={() => onLeaveClassroom?.(classroom)}
+      className="text-destructive focus:text-destructive focus:bg-destructive/10"
+    >
+      <DoorOpen className="stroke-destructive" />
+      Leave classroom
+    </DropdownMenuItem>
   );
 }

@@ -7,6 +7,7 @@ import { queryClient } from "./services/react-query";
 import { Toaster } from "sonner";
 import { store } from "./store";
 import { Provider } from "react-redux";
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 
 import "./index.css";
 
@@ -17,6 +18,7 @@ createRoot(document.getElementById("root")!).render(
         <RouterProvider router={router} />
         <Toaster richColors />
       </Provider>
+      <ReactQueryDevtools initialIsOpen={false} />
     </QueryClientProvider>
   </StrictMode>,
 );

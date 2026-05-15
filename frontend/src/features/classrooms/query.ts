@@ -10,6 +10,6 @@ export const getClassroomsQueryOptions = (params?: GetClassroomsQueryParams) =>
 
 export const getClassroomDetailOptions = (classroomId: number) =>
   queryOptions({
-    queryKey: ["classroom", classroomId],
+    queryKey: ["classrooms", classroomId],
     queryFn: () => getClassroomDetail(classroomId),
   });

@@ -2,7 +2,13 @@ import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useLoaderData } from "react-router";
 import { formatDistanceToNow } from "date-fns";
-import { Users, ClipboardList, Zap, ArrowLeft } from "lucide-react";
+import {
+  Users,
+  ClipboardList,
+  Zap,
+  ArrowLeft,
+  MoreHorizontal,
+} from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -23,7 +29,6 @@ import { ExamsTab } from "./components/exam-tab";
 import StudentsTab from "./components/students-tab";
 import NotFound from "./components/not-found";
 import type { classroomDetailLoader } from "@/features/classrooms/loaders";
-import AppConfirmDialog from "@/components/app/app-confirm-dialog";
 
 export default function ClassroomDetail() {
   const classroomId =
@@ -36,17 +41,6 @@ export default function ClassroomDetail() {
     isPending,
     isError,
   } = useQuery(getClassroomDetailOptions(classroomId));
-
-  const [openLeaveDialog, setOpenLeaveDialog] = useState(false);
-
-  // Handlers passed to actions (wire up your dialogs here)
-  const handlers = {
-    onEdit: (c) => console.log("edit", c),
-    onDelete: (c) => console.log("delete", c),
-    onManageStudents: (c) => console.log("manage students", c),
-    onCreateExam: (c) => console.log("create exam", c),
-    onLeaveClassroom: (c) => console.log("leave classroom", c),
-  };
 
   if (isPending) return <ClassroomDetailSkeleton />;
 
@@ -79,19 +73,9 @@ export default function ClassroomDetail() {
                 </span>
               </div>
 
-              <div className="flex items-center justify-between flex-wrap gap-4">
-                <CardTitle className="text-2xl leading-tight">
-                  {classroom.name}
-                </CardTitle>
-
-                <Button
-                  variant="destructive"
-                  size="sm"
-                  onClick={() => setOpenLeaveDialog(true)}
-                >
-                  Leave classroom
-                </Button>
-              </div>
+              <CardTitle className="text-2xl leading-tight">
+                {classroom.name}
+              </CardTitle>
 
               {classroom.description && (
                 <CardDescription className="text-sm leading-relaxed whitespace-pre-wrap">
@@ -101,13 +85,15 @@ export default function ClassroomDetail() {
             </div>
 
             {/* Actions menu */}
-            <ClassroomDropdownMenu
-              classroom={classroom}
-              onEdit={handlers.onEdit}
-              onDelete={handlers.onDelete}
-              onManageStudents={handlers.onManageStudents}
-              onCreateExam={handlers.onCreateExam}
-            />
+            <ClassroomDropdownMenu classroom={classroom}>
+              <Button
+                variant="ghost"
+                size="icon"
+                aria-label="Classroom actions"
+              >
+                <MoreHorizontal />
+              </Button>
+            </ClassroomDropdownMenu>
           </div>
 
           <Separator className="mt-4" />
@@ -174,7 +160,7 @@ export default function ClassroomDetail() {
           </TabsList>
 
           {activeTab === "exams" && (
-            <Button size="sm" onClick={() => handlers.onCreateExam(classroom)}>
+            <Button size="sm">
               <Zap data-icon="inline-start" />
               New exam
             </Button>
@@ -184,7 +170,7 @@ export default function ClassroomDetail() {
         <TabsContent value="exams" className="mt-4">
           <ExamsTab
             exams={classroom.exams}
-            onCreateExam={() => handlers.onCreateExam(classroom)}
+            onCreateExam={() => console.log("create exam logic")}
           />
         </TabsContent>
 
@@ -192,17 +178,6 @@ export default function ClassroomDetail() {
           <StudentsTab students={classroom.students} />
         </TabsContent>
       </Tabs>
-
-      {/* Leave Classroom Dialog */}
-      <AppConfirmDialog
-        open={openLeaveDialog}
-        onOpenChange={setOpenLeaveDialog}
-        variant="destructive"
-        title="Leave classroom"
-        description="Are you sure you want to leave this classroom? You will no longer be able to access it and its exams. You can always rejoin later."
-        confirmLabel="Leave classroom"
-        onConfirm={() => handlers.onLeaveClassroom(classroom)}
-      />
     </div>
   );
 }

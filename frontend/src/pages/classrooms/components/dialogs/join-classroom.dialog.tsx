@@ -1,11 +1,13 @@
 import { Controller, useForm } from "react-hook-form";
 import {
   Dialog,
+  DialogClose,
   DialogContent,
   DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
+  DialogTrigger,
 } from "@/components/ui/dialog";
 import {
   Field,
@@ -20,34 +22,52 @@ import { useJoinClassroom } from "@/features/classrooms/hooks/use-classroom";
 import { zodResolver } from "@hookform/resolvers/zod";
 import z from "zod";
 import { Button } from "@/components/ui/button";
+import { useState, type PropsWithChildren } from "react";
+import { useUserPermissions } from "@/features/auth/hooks/use-user-permissions";
 
-type JoinDialogProps = {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-};
-export default function JoinDialog({ open, onOpenChange }: JoinDialogProps) {
+type JoinDialogProps = PropsWithChildren;
+export default function JoinDialog({ children }: JoinDialogProps) {
+  const [openDialog, setOpenDialog] = useState(false);
+  const { hasPermission } = useUserPermissions();
   const form = useForm({
     resolver: zodResolver(
       z.object({
         code: z.string().nonempty(),
       }),
     ),
+    defaultValues: {
+      code: "",
+    },
   });
 
   const [mutate, isPending] = useJoinClassroom();
 
-  const handleSubmit = form.handleSubmit((data) => mutate(data.code));
+  const handleSubmit = form.handleSubmit((data) =>
+    mutate(data.code, {
+      onSuccess: () => {
+        setOpenDialog(false);
+      },
+    }),
+  );
 
   return (
     <Dialog
-      open={open}
+      open={openDialog}
       onOpenChange={(next) => {
         if (!isPending) {
           form.reset();
-          onOpenChange(next);
+          setOpenDialog(next);
         }
       }}
     >
+      <DialogTrigger asChild>
+        {children ?? (
+          <Button variant={hasPermission("student") ? "default" : "outline"}>
+            <Hash /> Join classroom
+          </Button>
+        )}
+      </DialogTrigger>
+
       <DialogContent className="sm:max-w-sm">
         <DialogHeader>
           <DialogTitle>Join a classroom</DialogTitle>
@@ -67,11 +87,11 @@ export default function JoinDialog({ open, onOpenChange }: JoinDialogProps) {
                   <div className="relative">
                     <Hash className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
                     <Input
+                      {...field}
                       className="pl-9 font-mono tracking-widest uppercase"
                       placeholder="LGXxbO7H"
                       autoComplete="off"
                       autoFocus
-                      {...field}
                     />
                   </div>
                   <FieldDescription>
@@ -84,17 +104,18 @@ export default function JoinDialog({ open, onOpenChange }: JoinDialogProps) {
           </FieldGroup>
 
           <DialogFooter className="gap-2">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => {
-                form.reset();
-                onOpenChange(false);
-              }}
-              disabled={isPending}
-            >
-              Cancel
-            </Button>
+            <DialogClose asChild>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => {
+                  form.reset();
+                }}
+                disabled={isPending}
+              >
+                Cancel
+              </Button>
+            </DialogClose>
             <Button type="submit" disabled={isPending}>
               {isPending && (
                 <Loader2 data-icon="inline-start" className="animate-spin" />
