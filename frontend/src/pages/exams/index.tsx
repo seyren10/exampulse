@@ -1,6 +1,7 @@
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Plus } from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Plus } from "lucide-react";
+import { Link } from "react-router";
 
 export default function Exams() {
   return (
@@ -10,9 +11,11 @@ export default function Exams() {
           <h1 className="text-3xl font-bold">Exams</h1>
           <p className="text-muted-foreground">Create and manage your exams</p>
         </div>
-        <Button>
-          <Plus className="mr-2 h-4 w-4" />
-          Create Exam
+        <Button asChild>
+          <Link to="/exams/create">
+            <Plus className="size-4" />
+            Create Exam
+          </Link>
         </Button>
       </div>
 

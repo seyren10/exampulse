@@ -1,8 +1,8 @@
 import { httpClient } from "@/services/axios";
 import type {
-  LoginCredentialSchema,
-  RegisterSchema,
-  ResetPasswordSchema,
+  LoginCredentialPayload,
+  RegisterPayload,
+  ResetPasswordPayload,
   User,
 } from "./type";
 
@@ -11,7 +11,7 @@ export const getUser = async () => {
   return res.data;
 };
 
-export const registerUser = async (user: RegisterSchema) => {
+export const registerUser = async (user: RegisterPayload) => {
   const res = await httpClient.post<User>("/register", user);
   return res.data;
 };
@@ -19,7 +19,7 @@ export const logoutUser = async () => {
   await httpClient.post("/logout");
 };
 
-export const login = async (credentials: LoginCredentialSchema) => {
+export const login = async (credentials: LoginCredentialPayload) => {
   await csrfCookie();
   await httpClient.post("/login", credentials);
 };
@@ -39,7 +39,7 @@ export const forgotPassword = async (email: string) => {
   await httpClient.post("/forgot-password", { email });
 };
 
-export const resetPassword = async (data: ResetPasswordSchema) => {
+export const resetPassword = async (data: ResetPasswordPayload) => {
   const { email, password, password_confirmation, token } = data;
 
   await httpClient.post("/reset-password", {

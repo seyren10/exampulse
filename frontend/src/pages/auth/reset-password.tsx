@@ -1,6 +1,6 @@
 import { Link, useNavigate, useSearchParams } from "react-router";
 import { Controller, useForm } from "react-hook-form";
-import type { ResetPasswordSchema } from "@/features/auth/type";
+import type { ResetPasswordPayload } from "@/features/auth/type";
 import { resetPasswordSchema } from "@/features/auth/schema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { KeyRound } from "lucide-react";
@@ -22,7 +22,7 @@ export default function ResetPassword() {
   const email = searchParams.get("email");
   const [mutate, isPending] = useResetPassword();
 
-  const form = useForm<ResetPasswordSchema>({
+  const form = useForm<ResetPasswordPayload>({
     resolver: zodResolver(resetPasswordSchema),
     defaultValues: {
       token,

@@ -2,7 +2,7 @@ import { useMutation } from "@tanstack/react-query";
 import { resetPassword } from "../api";
 import type { ExampulseError } from "@/types/common";
 import { toast } from "sonner";
-import type { ResetPasswordSchema } from "../type";
+import type { ResetPasswordPayload } from "../type";
 
 export const useResetPassword = () => {
   const { mutate, isPending } = useMutation({
@@ -11,7 +11,7 @@ export const useResetPassword = () => {
       email,
       password,
       password_confirmation,
-    }: ResetPasswordSchema) =>
+    }: ResetPasswordPayload) =>
       resetPassword({
         email,
         password,

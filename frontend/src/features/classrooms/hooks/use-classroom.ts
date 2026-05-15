@@ -7,13 +7,8 @@ import {
   updateClassroom,
 } from "../api";
 import { toast } from "sonner";
-import type { ExampulseError } from "@/types/common";
 import type { ClassroomSchema } from "../type";
-
-const onError = (err: Error) => {
-  const error = err as ExampulseError;
-  toast.error(error.response?.data.message);
-};
+import { onErrorWithToast } from "@/lib/helpers";
 
 export const useCreateClassroom = () => {
   const queryClient = useQueryClient();
@@ -24,7 +19,7 @@ export const useCreateClassroom = () => {
     },
     onSettled: () =>
       queryClient.invalidateQueries({ queryKey: ["classrooms"] }),
-    onError,
+    onError: onErrorWithToast,
   });
 
   return [mutate, isPending] as const;
@@ -45,7 +40,7 @@ export const useUpdateClassroom = () => {
     },
     onSettled: () =>
       queryClient.invalidateQueries({ queryKey: ["classrooms"] }),
-    onError,
+    onError: onErrorWithToast,
   });
 
   return [mutate, isPending] as const;
@@ -63,7 +58,7 @@ export const useDeleteClassroom = () => {
     },
     onSettled: () =>
       queryClient.invalidateQueries({ queryKey: ["classrooms"] }),
-    onError,
+    onError: onErrorWithToast,
   });
 
   return [mutate, isPending] as const;
@@ -79,7 +74,7 @@ export const useJoinClassroom = () => {
     },
     onSettled: () =>
       queryClient.invalidateQueries({ queryKey: ["classrooms"] }),
-    onError,
+    onError: onErrorWithToast,
   });
 
   return [mutate, isPending] as const;
@@ -97,7 +92,7 @@ export const useLeaveClassroom = () => {
     },
     onSettled: () =>
       queryClient.invalidateQueries({ queryKey: ["classrooms"] }),
-    onError,
+    onError: onErrorWithToast,
   });
 
   return [mutate, isPending] as const;

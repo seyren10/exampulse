@@ -42,18 +42,16 @@ import {
 } from "@/features/classrooms/hooks/use-classroom";
 import EditClassroomDialog from "./dialogs/edit-classroom-dialog";
 import ClassroomForm from "./classroom-form";
-import { useNavigate } from "react-router";
+import { Link, useNavigate } from "react-router";
 
 type Props = PropsWithChildren & {
   classroom: Classroom;
   onManageStudents?: (classroom: Classroom) => void;
-  onCreateExam?: (classroom: Classroom) => void;
   onLeaveClassroom?: (classroom: Classroom) => void;
 };
 export default function ClassroomDropdownMenu({
   classroom,
   onManageStudents,
-  onCreateExam,
   children,
 }: Props) {
   const navigate = useNavigate();
@@ -144,9 +142,11 @@ export default function ClassroomDropdownMenu({
                 <DropdownMenuLabel className="text-xs font-normal text-muted-foreground">
                   Content
                 </DropdownMenuLabel>
-                <DropdownMenuItem onSelect={() => onCreateExam?.(classroom)}>
-                  <ClipboardList data-icon="inline-start" />
-                  Create exam
+                <DropdownMenuItem asChild>
+                  <Link to={`/classrooms/${classroom.id}/exams/create`}>
+                    <ClipboardList data-icon="inline-start" />
+                    Create exam
+                  </Link>
                 </DropdownMenuItem>
               </DropdownMenuGroup>
               <DropdownMenuSeparator />

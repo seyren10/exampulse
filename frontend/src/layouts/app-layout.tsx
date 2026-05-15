@@ -1,4 +1,4 @@
-import { Outlet, Link, useLocation, useSearchParams } from "react-router";
+import { Outlet, useSearchParams, NavLink } from "react-router";
 import {
   Bell,
   Settings,
@@ -24,7 +24,6 @@ const navigation = [
 ];
 
 export function AppLayout() {
-  const location = useLocation();
   const user = useSelector(selectUser);
   const [searchParams] = useSearchParams();
 
@@ -51,17 +50,20 @@ export function AppLayout() {
           {/* Navigation */}
           <nav className="flex gap-1 ml-8">
             {navigation.map((item) => {
-              const isActive = location.pathname === item.href;
               return (
-                <Link key={item.name} to={item.href}>
-                  <Button
-                    variant={isActive ? "secondary" : "ghost"}
-                    className="gap-2"
-                  >
-                    <item.icon className="h-4 w-4" />
-                    {item.name}
-                  </Button>
-                </Link>
+                <NavLink key={item.name} to={item.href}>
+                  {({ isActive }) => {
+                    return (
+                      <Button
+                        variant={isActive ? "secondary" : "ghost"}
+                        className="gap-2"
+                      >
+                        <item.icon className="h-4 w-4" />
+                        {item.name}
+                      </Button>
+                    );
+                  }}
+                </NavLink>
               );
             })}
           </nav>

@@ -22,7 +22,7 @@ import {
   AlertCircle,
 } from "lucide-react";
 import { registerSchema } from "@/features/auth/schema";
-import type { RegisterSchema, User } from "@/features/auth/type";
+import type { RegisterPayload, User } from "@/features/auth/type";
 import { registerUser } from "@/features/auth/api";
 import type { ExampulseError } from "@/types/common";
 import {
@@ -36,7 +36,7 @@ import { Link, useNavigate } from "react-router";
 
 export default function RegisterForm() {
   const navigate = useNavigate();
-  const form = useForm<RegisterSchema>({
+  const form = useForm<RegisterPayload>({
     resolver: zodResolver(registerSchema),
     defaultValues: {
       name: "",
@@ -50,7 +50,7 @@ export default function RegisterForm() {
   const { mutate, isPending, isError, error } = useMutation<
     User,
     ExampulseError,
-    RegisterSchema
+    RegisterPayload
   >({
     mutationFn: registerUser,
     onSuccess: () => {

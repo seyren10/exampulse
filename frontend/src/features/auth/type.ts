@@ -39,9 +39,9 @@ export type Student = {
 
 export type UserRole = (typeof USER_ROLE)[number];
 
-export type LoginCredentialSchema = z.infer<typeof loginCredentialSchema>;
-export type ResetPasswordSchema = z.infer<typeof resetPasswordSchema>;
-export type RegisterSchema = z.infer<typeof registerSchema>;
+export type LoginCredentialPayload = z.infer<typeof loginCredentialSchema>;
+export type ResetPasswordPayload = z.infer<typeof resetPasswordSchema>;
+export type RegisterPayload = z.infer<typeof registerSchema>;
 
 export type UserState = {
   user: User | null;

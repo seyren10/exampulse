@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { useLoaderData } from "react-router";
 import { formatDistanceToNow } from "date-fns";
 import {
   Users,
@@ -28,11 +27,10 @@ import { initials } from "@/lib/helpers";
 import { ExamsTab } from "./components/exam-tab";
 import StudentsTab from "./components/students-tab";
 import NotFound from "./components/not-found";
-import type { classroomDetailLoader } from "@/features/classrooms/loaders";
+import { useClassroomIdLoaderData } from "@/features/classrooms/hooks/use-classrooms-loader-data";
 
 export default function ClassroomDetail() {
-  const classroomId =
-    useLoaderData<Awaited<ReturnType<typeof classroomDetailLoader>>>();
+  const classroomId = useClassroomIdLoaderData();
 
   const [activeTab, setActiveTab] = useState("exams");
 

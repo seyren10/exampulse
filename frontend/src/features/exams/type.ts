@@ -1,5 +1,6 @@
 import type { Timestamps } from "@/types/common";
-import type { EXAM_TYPE } from "./schema";
+import type { EXAM_TYPE, examSchema } from "./schema";
+import type z from "zod";
 
 export type ExamType = (typeof EXAM_TYPE)[number];
 export type Exam = Timestamps & {
@@ -13,3 +14,7 @@ export type Exam = Timestamps & {
   deadline: string | null;
   is_published: boolean;
 };
+
+export type ExamSchema = z.infer<typeof examSchema>;
+export type CreateExamPayload = ExamSchema;
+export type UpdateExamPayload = Partial<CreateExamPayload>;
