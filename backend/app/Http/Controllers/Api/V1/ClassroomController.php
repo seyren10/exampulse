@@ -22,8 +22,13 @@ class ClassroomController extends Controller
         $perPage = $request->input('per_page', 25);
 
         $classrooms = $user->isTeacher() ?
-            $user->classrooms()->withCount(['students', 'exams'])->latest()->paginate($perPage) :
-            $user->enrolledClassrooms()->withCount(['students', 'exams'])->latest()->paginate($perPage);
+            $user->classrooms()
+                ->withCount(['students', 'exams'])
+                ->latest()
+                ->paginate($perPage) :
+            $user->enrolledClassrooms()->withCount(['students', 'exams'])
+                ->latest()
+                ->paginate($perPage);
 
         return ClassroomResource::collection($classrooms);
     }

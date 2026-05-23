@@ -6,9 +6,11 @@ use App\Enums\ExamType;
 use App\Models\Classroom;
 use App\Models\Question;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Facades\Auth;
 use Laravel\Scout\Searchable;
 
 #[Fillable([
@@ -25,6 +27,16 @@ class Exam extends Model
 {
     use Searchable;
 
+
+    protected static function booted(): void
+    {
+        static::addGlobalScope('published', function (Builder $builder) {
+            $user = Auth::user();
+            if ($user->isStudent()) {
+                $builder->where('is_published', true);
+            }
+        });
+    }
 
 
     protected function casts(): array
@@ -49,13 +61,6 @@ class Exam extends Model
             'teacher' => $this->classroom?->teacher?->name,
         ];
     }
-
-    // Only index published exams
-    public function shouldBeSearchable(): bool
-    {
-        return (bool) $this->is_published;
-    }
-
 
     // Relationships
     public function classroom(): BelongsTo

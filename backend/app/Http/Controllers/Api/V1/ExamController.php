@@ -8,8 +8,6 @@ use App\Http\Requests\UpdateExamRequest;
 use App\Http\Resources\ExamResource;
 use App\Models\Classroom;
 use App\Models\Exam;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 
 class ExamController extends Controller
@@ -22,18 +20,10 @@ class ExamController extends Controller
     {
         Gate::authorize('view', $classroom);
 
-        $user = Auth::user();
-
-        $q = request()->query('q');
-
-        // Use Scout for search with query() to apply database filters
-        $exams = Exam::search($q)
-            ->query(
-                fn($query) =>
-                $query->where('classroom_id', $classroom->id)
-                    ->when($user->isStudent(), fn($q) => $q->where('is_published', true))
-                    ->latest()
-            )
+        $exams = $classroom
+            ->exams()
+            ->withCount(['questions'])
+            ->latest()
             ->paginate();
 
 
@@ -46,7 +36,7 @@ class ExamController extends Controller
     public function show(Exam $exam)
     {
         Gate::authorize('view', $exam);
-
+        
         $exam->load(['questions.options', 'classroom.teacher:id,name']);
 
         return new ExamResource($exam);

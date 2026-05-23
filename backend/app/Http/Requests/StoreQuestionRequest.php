@@ -17,6 +17,37 @@ class StoreQuestionRequest extends FormRequest
     }
 
     /**
+     * Prepare the data for validation.
+     * Converts string booleans from multipart/form-data to actual booleans.
+     */
+    protected function prepareForValidation(): void
+    {
+        if (!$this->has('options')) {
+            return;
+        }
+
+        $this->merge([
+            'options' => collect($this->input('options'))
+                ->map(fn(array $option) => [
+                    ...$option,
+                    'is_correct' => $this->castToBoolean($option['is_correct'] ?? null),
+                ])
+                ->all(),
+        ]);
+    }
+
+    /**
+     * Cast a value to boolean, handling string representations from form data.
+     */
+    private function castToBoolean(mixed $value): bool
+    {
+        if (is_bool($value)) {
+            return $value;
+        }
+
+        return filter_var($value, FILTER_VALIDATE_BOOLEAN) === true;
+    }
+    /**
      * Get the validation rules that apply to the request.
      *
      * @return array<string, ValidationRule|array<mixed>|string>

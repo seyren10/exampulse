@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\AutosaveQuestionRequest;
 use App\Http\Requests\StoreQuestionRequest;
 use App\Http\Requests\UpdateQuestionRequest;
 use App\Http\Resources\QuestionResource;
@@ -13,6 +14,14 @@ use Illuminate\Support\Facades\Storage;
 
 class QuestionController extends Controller
 {
+
+    public function index(Exam $exam)
+    {
+        Gate::authorize('view', $exam);
+        $options = $exam->questions()->with('options')->paginate(50);
+
+        return QuestionResource::collection($options);
+    }
     /**
      * Create question with options
      */

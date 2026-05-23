@@ -27,7 +27,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Questions (nested under exams)
     Route::apiResource('exams.questions', QuestionController::class)
-        ->except(['index', 'show'])
+        ->except(['show'])
         ->shallow();
 
     // Exam Sessions (students only)
