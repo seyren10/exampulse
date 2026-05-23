@@ -13,11 +13,6 @@ export default function ClassroomDetailSkeleton() {
         </CardHeader>
       </Card>
       <Skeleton className="h-10 w-72" />
-      <div className="space-y-3">
-        {[1, 2, 3].map((i) => (
-          <Skeleton key={i} className="h-20 w-full" />
-        ))}
-      </div>
     </div>
   );
 }

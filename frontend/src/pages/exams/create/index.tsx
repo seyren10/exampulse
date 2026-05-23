@@ -1,36 +1,48 @@
 import { Button } from "@/components/ui/button";
-import ExamForm, { type ExamFormIntent } from "../components/forms/exam-form";
-import { Link, useNavigate } from "react-router";
-import { ArrowLeft } from "lucide-react";
+import { useClassroomIdLoaderData } from "@/features/classrooms/hooks/use-classrooms-loader-data";
 import { useCreateExam } from "@/features/exams/hooks/use-exam";
 import type { ExamSchema } from "@/features/exams/type";
+import ExamForm, {
+  type ExamFormIntent,
+} from "@/pages/exams/components/forms/exam-form";
+import { ArrowLeft } from "lucide-react";
+import { Link, useNavigate } from "react-router";
 
-export default function ExamCreate() {
-  const [createExam, isCreating] = useCreateExam();
+export default function ClassroomExamCreate() {
+  const classroomId = useClassroomIdLoaderData();
+
   const navigate = useNavigate();
+
+  const [createExam, isCreating] = useCreateExam();
   const handleCreateExam = (payload: ExamSchema, intent: ExamFormIntent) => {
-    console.log(intent)
     if (intent === "save-only") {
-      createExam(payload, {
-        onSuccess: (exam) => {
-          navigate(`/exams/${exam.id}`);
+      createExam(
+        {
+          classroomId,
+          payload,
         },
-      });
+        {
+          onSuccess: () => {
+            navigate(-1);
+          },
+        },
+      );
     }
   };
   return (
-    <div className="mx-auto max-w-2xl space-y-8 px-4 py-8">
+    <div className="space-y-8 px-4 py-8">
       {/* ── Header ── */}
       <div className="space-y-1">
         <Button
           variant="ghost"
           size="sm"
           className="-ml-2 text-muted-foreground"
+          disabled={isCreating}
           asChild
         >
-          <Link to={"/exams"}>
+          <Link to="../" relative="path">
             <ArrowLeft data-icon="inline-start" />
-            Back to Exams
+            Go back
           </Link>
         </Button>
 

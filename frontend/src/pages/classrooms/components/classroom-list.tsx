@@ -47,7 +47,7 @@ export default function ClassroomList({ classrooms, action }: Props) {
 
                 {/* Name */}
                 <Link
-                  to={`/classrooms/${classroom.id}`}
+                  to={`/classrooms/${classroom.id}/exams`}
                   className="hover:underline underline-offset-2 decoration-muted-foreground"
                 >
                   <CardTitle className="text-base leading-snug">

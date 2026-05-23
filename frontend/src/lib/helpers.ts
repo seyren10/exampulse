@@ -26,3 +26,18 @@ export const onErrorWithToast = (err: Error) => {
   const error = err as ExampulseError;
   toast.error(error.response?.data.message);
 };
+
+/**
+ * Converts an object to a FormData object
+ */
+export const toFormData = (obj: Record<string, any>) => {
+  const formData = new FormData();
+  Object.entries(obj).forEach(([key, value]) => {
+    if (typeof value === "boolean") {
+      value = value ? "1" : "0";
+    }
+    
+    formData.append(key, value);
+  });
+  return formData;
+};

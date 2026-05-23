@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { formatDistanceToNow } from "date-fns";
 import {
@@ -16,7 +15,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
 import ClassroomDropdownMenu from "../components/classroom-dropdown";
@@ -24,16 +23,14 @@ import { getClassroomDetailOptions } from "@/features/classrooms/query";
 import ClassroomDetailSkeleton from "./components/skeleton";
 import StatusBadge from "./components/status-badge";
 import { initials } from "@/lib/helpers";
-import { ExamsTab } from "./components/exam-tab";
-import StudentsTab from "./components/students-tab";
 import NotFound from "./components/not-found";
 import { useClassroomIdLoaderData } from "@/features/classrooms/hooks/use-classrooms-loader-data";
+import { Link, Outlet } from "react-router";
+import { useState } from "react";
 
 export default function ClassroomDetail() {
   const classroomId = useClassroomIdLoaderData();
-
   const [activeTab, setActiveTab] = useState("exams");
-
   const {
     data: classroom,
     isPending,
@@ -131,50 +128,47 @@ export default function ClassroomDetail() {
       <Tabs value={activeTab} onValueChange={setActiveTab}>
         <div className="flex items-center justify-between gap-4">
           <TabsList>
-            <TabsTrigger value="exams" className="gap-1.5">
-              <ClipboardList className="size-4" />
-              Exams
-              {classroom.exams?.length > 0 && (
-                <Badge
-                  variant="secondary"
-                  className="ml-1 h-4 px-1.5 text-[10px]"
-                >
-                  {classroom.exams.length}
-                </Badge>
-              )}
+            <TabsTrigger value="exams" className="gap-1.5" asChild>
+              <Link to="exams" replace>
+                <ClipboardList className="size-4" />
+                Exams
+                {classroom.exams?.length > 0 && (
+                  <Badge
+                    variant="secondary"
+                    className="ml-1 h-4 px-1.5 text-[10px]"
+                  >
+                    {classroom.exams.length}
+                  </Badge>
+                )}
+              </Link>
             </TabsTrigger>
-            <TabsTrigger value="students" className="gap-1.5">
-              <Users className="size-4" />
-              Students
-              {classroom.students?.length > 0 && (
-                <Badge
-                  variant="secondary"
-                  className="ml-1 h-4 px-1.5 text-[10px]"
-                >
-                  {classroom.students.length}
-                </Badge>
-              )}
+            <TabsTrigger value="students" className="gap-1.5" asChild>
+              <Link to="students" replace>
+                <Users className="size-4" />
+                Students
+                {classroom.students?.length > 0 && (
+                  <Badge
+                    variant="secondary"
+                    className="ml-1 h-4 px-1.5 text-[10px]"
+                  >
+                    {classroom.students.length}
+                  </Badge>
+                )}
+              </Link>
             </TabsTrigger>
           </TabsList>
 
           {activeTab === "exams" && (
-            <Button size="sm">
-              <Zap data-icon="inline-start" />
-              New exam
+            <Button size="sm" asChild>
+              <Link to={`/classrooms/${classroom.id}/exams/create`}>
+                <Zap data-icon="inline-start" />
+                New exam
+              </Link>
             </Button>
           )}
         </div>
 
-        <TabsContent value="exams" className="mt-4">
-          <ExamsTab
-            exams={classroom.exams}
-            onCreateExam={() => console.log("create exam logic")}
-          />
-        </TabsContent>
-
-        <TabsContent value="students" className="mt-4">
-          <StudentsTab students={classroom.students} />
-        </TabsContent>
+        <Outlet />
       </Tabs>
     </div>
   );

@@ -13,6 +13,7 @@ export type Exam = Timestamps & {
   scheduled_at: string;
   deadline: string | null;
   is_published: boolean;
+  questions_count: number;
 };
 
 export type ExamSchema = z.infer<typeof examSchema>;

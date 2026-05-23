@@ -15,6 +15,7 @@ import { useSelector } from "react-redux";
 import { selectUser } from "@/features/auth/slice";
 import { useEffect } from "react";
 import { toast } from "sonner";
+import { TooltipProvider } from "@/components/ui/tooltip";
 
 const navigation = [
   { name: "Dashboard", href: "/", icon: LayoutDashboard },
@@ -99,7 +100,9 @@ export function AppLayout() {
 
       {/* Main Content */}
       <main className="container py-6 mx-auto">
-        <Outlet />
+        <TooltipProvider>
+          <Outlet />
+        </TooltipProvider>
       </main>
     </div>
   );

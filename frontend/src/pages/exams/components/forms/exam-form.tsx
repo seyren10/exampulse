@@ -1,6 +1,6 @@
 import { useForm, Controller, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useParams, Link } from "react-router";
+import { Link } from "react-router";
 import { format } from "date-fns";
 import {
   ChevronDown,
@@ -103,8 +103,6 @@ type ExamFormProps = {
   loading?: boolean;
 };
 export default function ExamForm({ exam, onSubmit, loading }: ExamFormProps) {
-  const { classroomId } = useParams();
-
   const { handleSubmit, control, setValue } = useForm<ExamSchema>({
     resolver: zodResolver(examSchema),
     defaultValues: {
@@ -371,7 +369,9 @@ export default function ExamForm({ exam, onSubmit, loading }: ExamFormProps) {
       {/* ─ Actions ─ */}
       <div className="flex items-center justify-between">
         <Button variant="ghost" asChild disabled={loading}>
-          <Link to={`/classrooms/${classroomId}`}>Cancel</Link>
+          <Link to="../" relative="path">
+            Cancel
+          </Link>
         </Button>
 
         <SplitSubmitButton

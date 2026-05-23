@@ -1,4 +1,5 @@
 import type { RouteObject } from "react-router";
+import { examsRoutes } from "./exams";
 
 export const classroomRoutes: RouteObject = {
   path: "/classrooms",
@@ -15,24 +16,12 @@ export const classroomRoutes: RouteObject = {
       lazy: {
         loader: async () =>
           (await import("@/features/classrooms/loaders")).classroomDetailLoader,
+        Component: async () =>
+          (await import("@/pages/classrooms/details")).default,
       },
-      children: [
-        {
-          index: true,
-          lazy: {
-            Component: async () =>
-              (await import("@/pages/classrooms/details")).default,
-          },
-        },
-        {
-          path: "exams/create",
-          lazy: {
-            Component: async () =>
-              (await import("@/pages/classrooms/exams/create")).default,
-          },
-        },
-      ],
+      children: [examsRoutes],
     },
+
     {
       path: "join/:joinCode",
       lazy: {

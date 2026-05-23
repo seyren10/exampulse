@@ -18,8 +18,10 @@ export const useCreateExam = () => {
     onSuccess: () => {
       toast.info("exam created successfully.");
     },
-    onSettled: () =>
-      queryClient.invalidateQueries({ queryKey: ["classrooms", "exams"] }),
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ["classrooms"] });
+      queryClient.invalidateQueries({ queryKey: ["classrooms", "exams"] });
+    },
     onError: onErrorWithToast,
   });
 

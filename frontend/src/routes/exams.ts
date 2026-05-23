@@ -1,7 +1,9 @@
 import type { RouteObject } from "react-router";
+import { questionRoutes } from "./questions";
 
+/* child route of classrooms */
 export const examsRoutes: RouteObject = {
-  path: "/exams",
+  path: "exams",
   children: [
     {
       index: true,
@@ -17,9 +19,19 @@ export const examsRoutes: RouteObject = {
     },
     {
       path: ":examId",
-      lazy: {
-        Component: async () => (await import("@/pages/exams/details")).default,
-      },
+      id: "exams.details",
+      children: [
+        {
+          index: true,
+          lazy: {
+            loader: async () =>
+              (await import("@/features/exams/loader")).getExamDetailLoader,
+            Component: async () =>
+              (await import("@/pages/exams/details")).default,
+          },
+        },
+        questionRoutes,
+      ],
     },
   ],
 };

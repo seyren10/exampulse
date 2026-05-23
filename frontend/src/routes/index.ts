@@ -4,20 +4,22 @@ import { createBrowserRouter, replace } from "react-router";
 import { authRoutes } from "./auth";
 import { getUserLoader } from "@/features/auth/loaders";
 import { classroomRoutes } from "./classrooms";
-import { examsRoutes } from "./exams";
+import { examSoloRoutes } from "./exam-solo";
+import AppLoader from "@/components/app/app-loader";
 
 const router = createBrowserRouter([
   {
     path: "/",
     Component: AppLayout,
     loader: getUserLoader,
+    HydrateFallback: AppLoader,
     children: [
       {
         index: true,
         Component: Dashboard,
       },
       classroomRoutes,
-      examsRoutes,
+      examSoloRoutes,
       {
         path: "/messages",
         lazy: {
@@ -31,6 +33,15 @@ const router = createBrowserRouter([
     loader: ({ request }) => {
       const { search } = new URL(request.url);
       return replace(`/${search}`);
+    },
+  },
+  {
+    path: "/exams/:examId/questions/manage",
+    HydrateFallback: AppLoader,
+    lazy: {
+      loader: async () =>
+        (await import("@/features/exams/loader")).getExamDetailQueryLoader,
+      Component: async () => (await import("@/pages/questions/create")).default,
     },
   },
   authRoutes,
